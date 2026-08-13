@@ -15,6 +15,12 @@ document.addEventListener('DOMContentLoaded', () => {
     loadingScreen.style.display = 'none';
     audioControls.style.display = 'block';
     arStarted = true;
+
+    // Start MindAR Engine manually
+    const sceneEl = document.querySelector('a-scene');
+    if (sceneEl.systems["mindar-image-system"]) {
+      sceneEl.systems["mindar-image-system"].start();
+    }
   });
 
   // Handle Mute Button

@@ -11,7 +11,7 @@
   <link rel="stylesheet" href="./style.css">
 
   <!-- A-Frame and MindAR libraries -->
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
@@ -41,7 +41,7 @@
   <!-- AR Scene -->
   <!-- We use uiLoading="no" and uiScanning="no" so we can build our own custom UI if needed, but mindar provides defaults. -->
   <a-scene 
-    mindar-image="imageTargetSrc: ./assets/targets/targets.mind;" 
+    mindar-image="imageTargetSrc: ./assets/targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
     color-space="sRGB" 
     renderer="colorManagement: true, physicallyCorrectLights" 
     vr-mode-ui="enabled: false" 
