@@ -4,22 +4,38 @@ document.addEventListener('DOMContentLoaded', () => {
   const audioControls = document.getElementById('audio-controls');
   const muteBtn = document.getElementById('mute-btn');
   const bgMusic = document.getElementById('bg-music');
-  const targetEntity = document.getElementById('target-entity');
+  const sceneEl = document.querySelector('a-scene');
   
   let isMuted = false;
-  let arStarted = false;
 
   // Handle Start AR Button
   startBtn.addEventListener('click', () => {
     // Hide UI
     loadingScreen.style.display = 'none';
     audioControls.style.display = 'block';
-    arStarted = true;
 
-    // Start MindAR Engine manually
-    const sceneEl = document.querySelector('a-scene');
-    if (sceneEl.systems["mindar-image-system"]) {
-      sceneEl.systems["mindar-image-system"].start();
+    // Play music immediately since we aren't waiting for a target
+    bgMusic.play().catch(e => console.log('Audio autoplay blocked', e));
+
+    // Start WebXR AR Session if available
+    if (sceneEl.is('vr-mode') || sceneEl.is('ar-mode')) return;
+    
+    if (sceneEl.hasLoaded) {
+      enterAR();
+    } else {
+      sceneEl.addEventListener('loaded', enterAR);
+    }
+    
+    function enterAR() {
+      // Attempt to enter immersive AR mode (works on supported Android Chrome)
+      if (sceneEl.xrSessionPromise || !navigator.xr) {
+        // Fallback for iOS / non-WebXR browsers: the camera will just act as a magic window 
+        // using device orientation controls built into a-camera.
+        console.log("No WebXR found, falling back to magic window.");
+      } else {
+        sceneEl.renderer.xr.setSessionMode('immersive-ar');
+        sceneEl.enterVR();
+      }
     }
   });
 
@@ -29,24 +45,4 @@ document.addEventListener('DOMContentLoaded', () => {
     bgMusic.muted = isMuted;
     muteBtn.innerText = isMuted ? '🔇 Unmute' : '🎵 Mute';
   });
-
-  // MindAR Events
-  targetEntity.addEventListener('targetFound', () => {
-    console.log('Target found! The pirate treasure appears!');
-    if (arStarted) {
-      bgMusic.play().catch(e => console.log('Audio autoplay blocked', e));
-    }
-  });
-
-  targetEntity.addEventListener('targetLost', () => {
-    console.log('Target lost.');
-    if (arStarted) {
-      bgMusic.pause();
-    }
-  });
-  
-  // Basic check for supported browsers (camera permissions context)
-  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-    document.getElementById('fallback-message').style.display = 'block';
-  }
 });

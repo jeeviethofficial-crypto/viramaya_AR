@@ -10,9 +10,8 @@
   <!-- Styles -->
   <link rel="stylesheet" href="./style.css">
 
-  <!-- A-Frame and MindAR libraries -->
+  <!-- A-Frame library -->
   <script src="https://aframe.io/releases/1.4.2/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
 </head>
 <body>
 
@@ -20,7 +19,7 @@
   <div id="ui-container">
     <div id="loading-screen" class="parchment">
       <h1>Pirate's Treasure AR</h1>
-      <p>Point your camera at the SLIIT logo to reveal the hidden treasure...</p>
+      <p>Look around to find the hidden pirate world!</p>
       
       <button id="start-btn" class="wooden-btn">Start AR</button>
       
@@ -38,77 +37,73 @@
   <!-- Audio Element (Placeholder) -->
   <audio id="bg-music" src="./assets/audio/pirate-music.mp3" loop></audio>
 
-  <!-- AR Scene -->
-  <!-- We use uiLoading="no" and uiScanning="no" so we can build our own custom UI if needed, but mindar provides defaults. -->
+  <!-- AR Scene (Markerless) -->
   <a-scene 
-    mindar-image="imageTargetSrc: ./assets/targets/targets.mind; autoStart: false; uiLoading: no; uiScanning: no;" 
+    webxr="optionalFeatures: dom-overlay; overlayElement: #ui-container;"
     color-space="sRGB" 
     renderer="colorManagement: true, physicallyCorrectLights" 
-    vr-mode-ui="enabled: false" 
-    device-orientation-permission-ui="enabled: false">
+    vr-mode-ui="enabled: false"
+    background="transparent: true">
     
     <a-assets>
-      <!-- Placeholder for actual models. We will build a scene with primitives for now. -->
+      <!-- Placeholder for actual models -->
     </a-assets>
 
-    <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
+    <!-- The camera, starts at 0, 1.6, 0 by default in A-Frame -->
+    <a-camera position="0 1.6 0" look-controls="enabled: true"></a-camera>
 
-    <!-- This entity is the root of our AR world. It tracks the first target (index 0) -->
-    <a-entity mindar-image-target="targetIndex: 0" id="target-entity">
+    <!-- Pirate World Container - placed 3 meters in front of the user (z: -3) and slightly below eye level (y: 0.5) -->
+    <a-entity id="pirate-world" scale="0.8 0.8 0.8" position="0 0.5 -3">
       
-      <!-- Pirate World Container - scale it down so it fits nicely on the logo -->
-      <a-entity id="pirate-world" scale="0.8 0.8 0.8" position="0 0 0.1" rotation="90 0 0">
-        
-        <!-- Lighting for dramatic pirate effect -->
-        <a-light type="ambient" color="#88aaff" intensity="0.5"></a-light>
-        <a-light type="directional" color="#ffaa55" position="-2 5 2" intensity="1.5" castShadow="true"></a-light>
+      <!-- Lighting for dramatic pirate effect -->
+      <a-light type="ambient" color="#88aaff" intensity="0.5"></a-light>
+      <a-light type="directional" color="#ffaa55" position="-2 5 2" intensity="1.5" castShadow="true"></a-light>
 
-        <!-- Ocean Water Base -->
-        <a-cylinder radius="2" height="0.05" color="#0055aa" position="0 -0.025 0" opacity="0.8" 
-          animation="property: rotation; to: 0 360 0; loop: true; dur: 30000; easing: linear">
-        </a-cylinder>
+      <!-- Ocean Water Base -->
+      <a-cylinder radius="2" height="0.05" color="#0055aa" position="0 -0.025 0" opacity="0.8" 
+        animation="property: rotation; to: 0 360 0; loop: true; dur: 30000; easing: linear">
+      </a-cylinder>
 
-        <!-- Desert Island -->
-        <a-cone radius-bottom="0.8" radius-top="0.2" height="0.4" color="#d2b48c" position="0 0.2 0"></a-cone>
+      <!-- Desert Island -->
+      <a-cone radius-bottom="0.8" radius-top="0.2" height="0.4" color="#d2b48c" position="0 0.2 0"></a-cone>
 
-        <!-- Palm Tree Trunk -->
-        <a-cylinder radius="0.05" height="0.6" color="#8b4513" position="0.2 0.5 0" rotation="0 0 -15"></a-cylinder>
-        
-        <!-- Palm Tree Leaves -->
-        <a-entity position="0.3 0.8 0" rotation="0 45 -15">
-          <a-cone radius-bottom="0" radius-top="0.3" height="0.1" color="#228b22" position="0 0 0"></a-cone>
-          <a-cone radius-bottom="0" radius-top="0.3" height="0.1" color="#228b22" position="0 -0.1 0"></a-cone>
-        </a-entity>
-
-        <!-- Treasure Chest (Base) -->
-        <a-box width="0.3" height="0.2" depth="0.2" color="#5c4033" position="-0.3 0.1 0.4" rotation="0 45 0">
-           <!-- Gold inside -->
-           <a-plane width="0.25" height="0.15" color="#ffd700" position="0 0.1 0" rotation="-90 0 0"></a-plane>
-           <!-- Chest Lid (animated) -->
-           <a-cylinder radius="0.1" height="0.3" color="#6b4423" position="0 0.1 -0.1" rotation="0 0 90" theta-start="0" theta-length="180"
-             animation="property: rotation; to: -45 0 90; dir: alternate; loop: true; dur: 2000">
-           </a-cylinder>
-        </a-box>
-
-        <!-- Floating Pirate Ship -->
-        <a-entity position="1 0.1 -0.5" 
-          animation="property: position; to: 1 0.15 -0.5; dir: alternate; loop: true; dur: 1500; easing: easeInOutSine">
-          
-          <!-- Hull -->
-          <a-box width="0.6" height="0.2" depth="0.3" color="#3e2723" position="0 0 0"></a-box>
-          <a-cone radius-bottom="0.15" radius-top="0" height="0.3" color="#3e2723" position="0.3 0 0" rotation="0 0 -90"></a-cone>
-          
-          <!-- Mast -->
-          <a-cylinder radius="0.02" height="0.6" color="#5c4033" position="0 0.3 0"></a-cylinder>
-          
-          <!-- Sails -->
-          <a-plane width="0.4" height="0.3" color="#ffffff" position="0.05 0.3 0.02" rotation="0 15 0" material="side: double"></a-plane>
-          
-          <!-- Pirate Flag (Black Square) -->
-          <a-plane width="0.15" height="0.1" color="#000000" position="0 0.55 0.02"></a-plane>
-        </a-entity>
-        
+      <!-- Palm Tree Trunk -->
+      <a-cylinder radius="0.05" height="0.6" color="#8b4513" position="0.2 0.5 0" rotation="0 0 -15"></a-cylinder>
+      
+      <!-- Palm Tree Leaves -->
+      <a-entity position="0.3 0.8 0" rotation="0 45 -15">
+        <a-cone radius-bottom="0" radius-top="0.3" height="0.1" color="#228b22" position="0 0 0"></a-cone>
+        <a-cone radius-bottom="0" radius-top="0.3" height="0.1" color="#228b22" position="0 -0.1 0"></a-cone>
       </a-entity>
+
+      <!-- Treasure Chest (Base) -->
+      <a-box width="0.3" height="0.2" depth="0.2" color="#5c4033" position="-0.3 0.1 0.4" rotation="0 45 0">
+          <!-- Gold inside -->
+          <a-plane width="0.25" height="0.15" color="#ffd700" position="0 0.1 0" rotation="-90 0 0"></a-plane>
+          <!-- Chest Lid (animated) -->
+          <a-cylinder radius="0.1" height="0.3" color="#6b4423" position="0 0.1 -0.1" rotation="0 0 90" theta-start="0" theta-length="180"
+            animation="property: rotation; to: -45 0 90; dir: alternate; loop: true; dur: 2000">
+          </a-cylinder>
+      </a-box>
+
+      <!-- Floating Pirate Ship -->
+      <a-entity position="1 0.1 -0.5" 
+        animation="property: position; to: 1 0.15 -0.5; dir: alternate; loop: true; dur: 1500; easing: easeInOutSine">
+        
+        <!-- Hull -->
+        <a-box width="0.6" height="0.2" depth="0.3" color="#3e2723" position="0 0 0"></a-box>
+        <a-cone radius-bottom="0.15" radius-top="0" height="0.3" color="#3e2723" position="0.3 0 0" rotation="0 0 -90"></a-cone>
+        
+        <!-- Mast -->
+        <a-cylinder radius="0.02" height="0.6" color="#5c4033" position="0 0.3 0"></a-cylinder>
+        
+        <!-- Sails -->
+        <a-plane width="0.4" height="0.3" color="#ffffff" position="0.05 0.3 0.02" rotation="0 15 0" material="side: double"></a-plane>
+        
+        <!-- Pirate Flag (Black Square) -->
+        <a-plane width="0.15" height="0.1" color="#000000" position="0 0.55 0.02"></a-plane>
+      </a-entity>
+      
     </a-entity>
   </a-scene>
 
